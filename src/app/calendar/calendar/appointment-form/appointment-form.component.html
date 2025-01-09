@@ -1,0 +1,42 @@
+<mat-dialog-content class="appointment-dialog-content">
+  <h2 class="appointment-dialog-title">
+    {{ selectedDate ? "Appointment for " + selectedDate : "Add Appointment" }}
+  </h2>
+
+  <form
+    [formGroup]="appointmentForm"
+    (ngSubmit)="onSubmit()"
+    class="appointment-form"
+  >
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Time</mat-label>
+      <input matInput type="time" formControlName="time" />
+    </mat-form-field>
+
+    <div class="dialog-buttons">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="submit-button"
+        [disabled]="!appointmentForm.valid"
+      >
+        Save
+      </button>
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="closeForm()"
+        class="cancel-button"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>

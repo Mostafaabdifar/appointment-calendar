@@ -1,0 +1,48 @@
+<div class="month-selector-container">
+  <mat-form-field appearance="fill" class="month-selector">
+    <mat-label>Select Month</mat-label>
+    <input
+      matInput
+      [matDatepicker]="monthPicker"
+      [(ngModel)]="selectedMonth"
+      (dateChange)="onMonthChange()"
+    />
+    <mat-datepicker-toggle
+      matSuffix
+      [for]="monthPicker"
+    ></mat-datepicker-toggle>
+    <mat-datepicker
+      #monthPicker
+      startView="multi-year"
+      [startAt]="selectedMonth"
+      [disabled]="false"
+      [dateClass]="dateClass"
+    ></mat-datepicker>
+  </mat-form-field>
+</div>
+
+<div class="calendar">
+  <div
+    class="calendar-day"
+    role="button"
+    *ngFor="let day of daysInMonth"
+    (click)="openAppointmentForm(day)"
+    [ngClass]="{ 'has-appointments': hasAppointments(day) }"
+    [class.today]="isToday(day)"
+  >
+    <div class="day-header">
+      <span class="day-number">{{ day | date : "d" }}</span>
+      <span class="day-month">{{ day | date : "MMM" }}</span>
+    </div>
+
+    <div
+      *ngFor="let appointment of appointments[day.toISOString()] || []"
+      class="appointment"
+    >
+      <mat-icon>event</mat-icon>
+      <div class="appointment-title">
+        {{ appointment.title }} ({{ appointment.time }})
+      </div>
+    </div>
+  </div>
+</div>
