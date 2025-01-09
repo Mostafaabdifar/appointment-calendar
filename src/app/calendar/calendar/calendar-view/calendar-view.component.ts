@@ -10,8 +10,8 @@ import { AppointmentFormComponent } from '../appointment-form/appointment-form.c
 export class CalendarViewComponent {
   selectedMonth: Date = new Date();
   daysInMonth: Date[] = [];
-  days = Array.from({ length: 30 }, (_, i) => new Date(2023, 0, i + 1));
   appointments: { [key: string]: any[] } = {};
+  minDate: Date = new Date();
 
   constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     this.updateCalendar();
@@ -22,6 +22,7 @@ export class CalendarViewComponent {
   }
 
   updateCalendar() {
+    if (!this.selectedMonth) return;
     const startOfMonth = new Date(
       this.selectedMonth.getFullYear(),
       this.selectedMonth.getMonth(),
@@ -34,7 +35,6 @@ export class CalendarViewComponent {
     );
     this.daysInMonth = [];
 
-    // Push all the days from the start to the end of the selected month
     for (let i = 0; i <= endOfMonth.getDate() - 1; i++) {
       const date = new Date(
         this.selectedMonth.getFullYear(),

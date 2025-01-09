@@ -3,19 +3,19 @@
     <mat-label>Select Month</mat-label>
     <input
       matInput
-      [matDatepicker]="monthPicker"
+      [matDatepicker]="datePicker"
       [(ngModel)]="selectedMonth"
       (dateChange)="onMonthChange()"
+      [min]="minDate"
     />
     <mat-datepicker-toggle
       matSuffix
-      [for]="monthPicker"
+      [for]="datePicker"
     ></mat-datepicker-toggle>
     <mat-datepicker
-      #monthPicker
+      #datePicker
       startView="multi-year"
       [startAt]="selectedMonth"
-      [disabled]="false"
       [dateClass]="dateClass"
     ></mat-datepicker>
   </mat-form-field>
