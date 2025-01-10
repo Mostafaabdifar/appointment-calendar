@@ -81,12 +81,16 @@ export class CalendarViewComponent {
     return this.appointments[dateKey] && this.appointments[dateKey].length > 0;
   }
 
+  isDayDisabled(day: Date): boolean {
+    return day < this.minDate;
+  }
+
   dateClass(date: Date): string {
     const today = new Date();
     return today.getDate() === date.getDate() &&
       today.getMonth() === date.getMonth() &&
       today.getFullYear() === date.getFullYear()
-      ? 'highlight-today' // Example: apply a CSS class to today
+      ? 'highlight-today'
       : '';
   }
 }

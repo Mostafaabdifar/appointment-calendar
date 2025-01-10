@@ -1,6 +1,6 @@
 <div class="month-selector-container">
   <mat-form-field appearance="fill" class="month-selector">
-    <mat-label>Select Month</mat-label>
+    <mat-label>Select Date</mat-label>
     <input
       matInput
       [matDatepicker]="datePicker"
@@ -8,10 +8,7 @@
       (dateChange)="onMonthChange()"
       [min]="minDate"
     />
-    <mat-datepicker-toggle
-      matSuffix
-      [for]="datePicker"
-    ></mat-datepicker-toggle>
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
     <mat-datepicker
       #datePicker
       startView="multi-year"
@@ -26,9 +23,12 @@
     class="calendar-day"
     role="button"
     *ngFor="let day of daysInMonth"
-    (click)="openAppointmentForm(day)"
-    [ngClass]="{ 'has-appointments': hasAppointments(day) }"
-    [class.today]="isToday(day)"
+    (click)="!isDayDisabled(day) && openAppointmentForm(day)"
+    [ngClass]="{
+      'has-appointments': hasAppointments(day),
+      'disabled-day': isDayDisabled(day),
+      'today': isToday(day)
+    }"
   >
     <div class="day-header">
       <span class="day-number">{{ day | date : "d" }}</span>
