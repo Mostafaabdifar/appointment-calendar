@@ -32,47 +32,29 @@ export class CalendarViewComponent {
 
   updateCalendar() {
     if (!this.selectedMonth) return;
-    const startOfMonth = new Date(
-      this.selectedMonth.getFullYear(),
-      this.selectedMonth.getMonth(),
-      1
+    
+    const year = this.selectedMonth.getFullYear();
+    const month = this.selectedMonth.getMonth();
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, month + 1, 0);
+    this.daysInMonth = Array.from({ length: endOfMonth.getDate() }, (_, i) => 
+      new Date(year, month, i + 1)
     );
-    const endOfMonth = new Date(
-      this.selectedMonth.getFullYear(),
-      this.selectedMonth.getMonth() + 1,
-      0
-    );
-    this.daysInMonth = [];
-
-    for (let i = 0; i <= endOfMonth.getDate() - 1; i++) {
-      const date = new Date(
-        this.selectedMonth.getFullYear(),
-        this.selectedMonth.getMonth(),
-        i + 1
-      );
-      this.daysInMonth.push(date);
-    }
+    
     this.connectedDropLists = this.daysInMonth.map((day) => day.toISOString());
   }
 
   isToday(day: Date): boolean {
     const today = new Date();
-    return (
-      today.getDate() === day.getDate() &&
-      today.getMonth() === day.getMonth() &&
-      today.getFullYear() === day.getFullYear()
-    );
+    return today.toDateString() === day.toDateString();
   }
 
   onDrop(event: CdkDragDrop<any[]>, newDay: Date) {
     const newDayKey = newDay.toISOString();
     const previousDayKey = event.previousContainer.id;
+
     if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -82,17 +64,15 @@ export class CalendarViewComponent {
       );
       const movedAppointment = event.container.data[event.currentIndex];
       movedAppointment.date = newDay.toLocaleDateString();
-
       this.appointments[previousDayKey] = [...event.previousContainer.data];
       this.appointments[newDayKey] = [...event.container.data];
     }
     this.cdr.detectChanges();
   }
 
+
   openAppointmentDialog(appointment: AppointmentFormValues): void {
-    this.dialog.open(AppointmentAlertComponent, {
-      data:appointment
-    });
+    this.dialog.open(AppointmentAlertComponent, { data: appointment });
   }
 
   openAppointmentForm(day: Date) {
@@ -101,25 +81,31 @@ export class CalendarViewComponent {
       data: { selectedDate: day },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addAppointment(result);
-      }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.addAppointment(result);
     });
   }
 
-  addAppointment(appointment: { title: string; date: string; time: string }) {
-    const dateKey = new Date(appointment.date).toISOString();
-    if (!this.appointments[dateKey]) {
-      this.appointments[dateKey] = [];
-    }
-    this.appointments[dateKey].push(appointment);
+
+  addAppointment({ title, date, time }: { title: string; date: string; time: string }) {
+    const dateKey = new Date(date).toISOString();
+    this.appointments[dateKey] = this.appointments[dateKey] || [];
+    this.appointments[dateKey].push({ title, date, time });
     this.cdr.detectChanges();
   }
 
-  hasAppointments(day: Date): boolean {
+  deleteAppointment(day: Date, appointment: any): void {
     const dateKey = day.toISOString();
-    return this.appointments[dateKey] && this.appointments[dateKey].length > 0;
+    const appointmentIndex = this.appointments[dateKey]?.indexOf(appointment);
+    if (appointmentIndex !== -1) {
+      this.appointments[dateKey].splice(appointmentIndex, 1);
+    }
+    this.cdr.detectChanges();
+  }
+  
+
+  hasAppointments(day: Date): boolean {
+    return (this.appointments[day.toISOString()]?.length || 0) > 0;
   }
 
   isDayDisabled(day: Date): boolean {
@@ -127,11 +113,6 @@ export class CalendarViewComponent {
   }
 
   dateClass(date: Date): string {
-    const today = new Date();
-    return today.getDate() === date.getDate() &&
-      today.getMonth() === date.getMonth() &&
-      today.getFullYear() === date.getFullYear()
-      ? 'highlight-today'
-      : '';
+    return this.isToday(date) ? 'highlight-today' : '';
   }
 }

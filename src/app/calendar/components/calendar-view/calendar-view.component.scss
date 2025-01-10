@@ -10,7 +10,7 @@
 
 .calendar {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
   padding: 10px;
   margin: 0 auto;
@@ -127,6 +127,17 @@
 
   &-title {
     flex-grow: 1;
+    width: 110px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-left: 8px;
+  }
+  .event-icon {
+    margin-right: auto;
+  }
+  .delete-icon {
+    margin-left: auto;
   }
 }
 
@@ -162,9 +173,4 @@
 .day-month {
   font-size: 14px;
   color: #757575;
-}
-
-mat-icon {
-  margin-right: 8px;
-  font-size: 16px;
 }

@@ -46,10 +46,15 @@
       cdkDrag
       (click)="openAppointmentDialog(appointment); $event.stopPropagation()"
     >
-      <mat-icon>event</mat-icon>
+      <mat-icon class="event-icon">event</mat-icon>
       <div class="appointment-title">
         {{ appointment.title }} ({{ appointment.time }})
       </div>
+      <mat-icon
+        class="delete-icon"
+        (click)="deleteAppointment(day, appointment); $event.stopPropagation()"
+        >delete</mat-icon
+      >
     </div>
   </div>
 </div>
