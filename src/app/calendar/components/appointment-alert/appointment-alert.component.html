@@ -1,0 +1,9 @@
+<mat-dialog-content class="appointment-dialog-content">
+  <h2 class="appointment-dialog-title">
+    {{ "Appointment for " + data.time }}
+  </h2>
+  <p>{{ data.title }}</p>
+  <button mat-raised-button color="primary" type="button" (click)="closeForm()">
+    Ok
+  </button>
+</mat-dialog-content>

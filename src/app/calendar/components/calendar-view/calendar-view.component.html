@@ -24,10 +24,15 @@
     role="button"
     *ngFor="let day of daysInMonth"
     (click)="!isDayDisabled(day) && openAppointmentForm(day)"
+    cdkDropList
+    [cdkDropListConnectedTo]="connectedDropLists"
+    [cdkDropListData]="appointments[day.toISOString()] || []"
+    (cdkDropListDropped)="onDrop($event, day)"
+    [id]="day.toISOString()"
     [ngClass]="{
       'has-appointments': hasAppointments(day),
       'disabled-day': isDayDisabled(day),
-      'today': isToday(day)
+      today: isToday(day)
     }"
   >
     <div class="day-header">
@@ -38,6 +43,8 @@
     <div
       *ngFor="let appointment of appointments[day.toISOString()] || []"
       class="appointment"
+      cdkDrag
+      (click)="openAppointmentDialog(appointment); $event.stopPropagation()"
     >
       <mat-icon>event</mat-icon>
       <div class="appointment-title">

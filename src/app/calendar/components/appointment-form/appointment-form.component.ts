@@ -1,13 +1,33 @@
 import { Component, EventEmitter, Inject, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
 import { AppointmentFormValues } from '../../model/appointment';
 
 @Component({
   selector: 'app-appointment-form',
   templateUrl: './appointment-form.component.html',
   styleUrls: ['./appointment-form.component.scss'],
+  standalone: true,
+  imports: [
+    MatDialogModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
 })
 export class AppointmentFormComponent {
   @Output() appointmentCreated = new EventEmitter<AppointmentFormValues>();

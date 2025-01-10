@@ -1,6 +1,13 @@
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AppointmentFormComponent } from '../appointment-form/appointment-form.component';
+import { AppointmentAlertComponent } from '../appointment-alert/appointment-alert.component';
+import { AppointmentFormValues } from '../../model/appointment';
 
 @Component({
   selector: 'app-calendar-view',
@@ -12,9 +19,11 @@ export class CalendarViewComponent {
   daysInMonth: Date[] = [];
   appointments: { [key: string]: any[] } = {};
   minDate: Date = new Date();
+  connectedDropLists: string[] = [];
 
   constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     this.updateCalendar();
+    this.connectedDropLists = this.daysInMonth.map((day) => day.toISOString());
   }
 
   onMonthChange() {
@@ -43,6 +52,7 @@ export class CalendarViewComponent {
       );
       this.daysInMonth.push(date);
     }
+    this.connectedDropLists = this.daysInMonth.map((day) => day.toISOString());
   }
 
   isToday(day: Date): boolean {
@@ -52,6 +62,37 @@ export class CalendarViewComponent {
       today.getMonth() === day.getMonth() &&
       today.getFullYear() === day.getFullYear()
     );
+  }
+
+  onDrop(event: CdkDragDrop<any[]>, newDay: Date) {
+    const newDayKey = newDay.toISOString();
+    const previousDayKey = event.previousContainer.id;
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+      const movedAppointment = event.container.data[event.currentIndex];
+      movedAppointment.date = newDay.toLocaleDateString();
+
+      this.appointments[previousDayKey] = [...event.previousContainer.data];
+      this.appointments[newDayKey] = [...event.container.data];
+    }
+    this.cdr.detectChanges();
+  }
+
+  openAppointmentDialog(appointment: AppointmentFormValues): void {
+    this.dialog.open(AppointmentAlertComponent, {
+      data:appointment
+    });
   }
 
   openAppointmentForm(day: Date) {

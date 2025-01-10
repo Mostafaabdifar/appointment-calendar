@@ -10,47 +10,96 @@
 
 .calendar {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 16px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  padding: 10px;
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 1000px;
+
+  .calendar-day {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    &.today {
+      background-color: #00e5ff;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    &:hover {
+      background-color: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    &.has-appointments {
+      border-left: 4px solid #4caf50;
+      background-color: #c4dec5;
+    }
+
+    &.disabled-day {
+      pointer-events: none;
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .day-header {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .appointment {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-top: 6px;
+      text-align: left;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
 }
 
-.calendar-day {
-  position: relative;
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 12px;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 120px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-  &.today {
-    background-color: #00e5ff;
-    color: #fff;
-    font-weight: bold;
+@media (max-width: 768px) {
+  .calendar {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
   }
 
-  &:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
+  .calendar-day {
+    padding: 8px;
+    min-height: 80px;
+
+    .appointment {
+      font-size: 10px;
+      padding: 3px 6px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
   }
 
-  &.has-appointments {
-    border-left: 4px solid #4caf50;
-  }
+  .calendar-day {
+    min-height: 70px;
 
-  &.disabled-day {
-    pointer-events: none;
-    opacity: 0.4;
-    cursor: not-allowed;
+    .day-header {
+      font-size: 12px;
+    }
   }
 }
 

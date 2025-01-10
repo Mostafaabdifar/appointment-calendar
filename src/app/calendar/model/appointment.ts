@@ -1,5 +1,5 @@
 export interface AppointmentFormValues {
   title: string;
-  date: string;
+  date?: string;
   time: string;
 }
