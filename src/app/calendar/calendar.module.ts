@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppointmentFormComponent } from './calendar/appointment-form/appointment-form.component';
-import { CalendarViewComponent } from './calendar/calendar-view/calendar-view.component';
+import { AppointmentFormComponent } from './components/appointment-form/appointment-form.component';
+import { CalendarViewComponent } from './components/calendar-view/calendar-view.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
