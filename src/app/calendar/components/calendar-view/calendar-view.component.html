@@ -51,6 +51,11 @@
         {{ appointment.title }} ({{ appointment.time }})
       </div>
       <mat-icon
+        class="edit-icon"
+        (click)="editAppointment(day, appointment); $event.stopPropagation()"
+        >edit</mat-icon
+      >
+      <mat-icon
         class="delete-icon"
         (click)="deleteAppointment(day, appointment); $event.stopPropagation()"
         >delete</mat-icon

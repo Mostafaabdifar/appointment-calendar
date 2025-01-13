@@ -7,12 +7,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AppointmentFormValues } from '../../model/appointment';
 
@@ -27,43 +27,52 @@ import { AppointmentFormValues } from '../../model/appointment';
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
+    MatFormFieldModule,
   ],
 })
 export class AppointmentFormComponent {
   @Output() appointmentCreated = new EventEmitter<AppointmentFormValues>();
+  @Output() appointmentUpdated = new EventEmitter<AppointmentFormValues>();
   @Output() close = new EventEmitter<void>();
 
   appointmentForm: FormGroup;
   selectedDate: string | null;
+  submitButtonLabel: string = 'Save';
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AppointmentFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { selectedDate?: Date }
+    @Inject(MAT_DIALOG_DATA)
+    public data: { appointment?: any; selectedDate?: Date }
   ) {
     const initialDate = data.selectedDate
       ? data.selectedDate.toLocaleDateString()
       : '';
+    this.submitButtonLabel = data.appointment ? 'Update' : 'Save';
     this.selectedDate = initialDate;
 
     this.appointmentForm = this.fb.group({
-      title: ['', Validators.required],
+      title: [data?.appointment?.title || '', Validators.required],
       date: [initialDate, Validators.required],
-      time: ['', Validators.required],
+      time: [data?.appointment?.time || '', Validators.required],
     });
-  }
-
-  onDateChange(event: MatDatepickerInputEvent<Date>): void {
-    this.selectedDate = event.value?.toLocaleDateString() || null;
   }
 
   onSubmit(): void {
     if (this.appointmentForm.valid) {
       const appointment = {
         ...this.appointmentForm.value,
-        date: this.selectedDate || this.appointmentForm.value.date,
+        date:
+          this.appointmentForm.value.date ||
+          this.data.selectedDate?.toLocaleDateString(),
       };
-      this.appointmentCreated.emit(appointment);
+
+      if (this.data.appointment) {
+        this.appointmentUpdated.emit(appointment);
+      } else {
+        this.appointmentCreated.emit(appointment);
+      }
+
       this.dialogRef.close(appointment);
       this.appointmentForm.reset();
     }

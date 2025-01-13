@@ -40,6 +40,10 @@
 
 .mat-form-field {
   width: 100%;
+
+  & .mat-error {
+    color: red;
+  }
 }
 
 .mat-datepicker-toggle {

@@ -32,15 +32,16 @@ export class CalendarViewComponent {
 
   updateCalendar() {
     if (!this.selectedMonth) return;
-    
+
     const year = this.selectedMonth.getFullYear();
     const month = this.selectedMonth.getMonth();
     const startOfMonth = new Date(year, month, 1);
     const endOfMonth = new Date(year, month + 1, 0);
-    this.daysInMonth = Array.from({ length: endOfMonth.getDate() }, (_, i) => 
-      new Date(year, month, i + 1)
+    this.daysInMonth = Array.from(
+      { length: endOfMonth.getDate() },
+      (_, i) => new Date(year, month, i + 1)
     );
-    
+
     this.connectedDropLists = this.daysInMonth.map((day) => day.toISOString());
   }
 
@@ -54,7 +55,11 @@ export class CalendarViewComponent {
     const previousDayKey = event.previousContainer.id;
 
     if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -70,7 +75,6 @@ export class CalendarViewComponent {
     this.cdr.detectChanges();
   }
 
-
   openAppointmentDialog(appointment: AppointmentFormValues): void {
     this.dialog.open(AppointmentAlertComponent, { data: appointment });
   }
@@ -81,13 +85,20 @@ export class CalendarViewComponent {
       data: { selectedDate: day },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) this.addAppointment(result);
     });
   }
 
-
-  addAppointment({ title, date, time }: { title: string; date: string; time: string }) {
+  addAppointment({
+    title,
+    date,
+    time,
+  }: {
+    title: string;
+    date: string;
+    time: string;
+  }) {
     const dateKey = new Date(date).toISOString();
     this.appointments[dateKey] = this.appointments[dateKey] || [];
     this.appointments[dateKey].push({ title, date, time });
@@ -102,7 +113,45 @@ export class CalendarViewComponent {
     }
     this.cdr.detectChanges();
   }
+
+  editAppointment(day: Date, appointment: any): void {
+    const dialogRef = this.dialog.open(AppointmentFormComponent, {
+      width: '400px',
+      data: { appointment, selectedDate: day },
+    });
   
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.updateAppointment(day, appointment, result);
+      }
+    });
+    // const dateKey = day.toISOString();
+    // const appointmentIndex = this.appointments[dateKey]?.indexOf(appointment);
+
+    // if (appointmentIndex !== -1) {
+    //   const updatedTitle = prompt('Edit Title', appointment.title);
+    //   const updatedTime = prompt('Edit Time (HH:MM)', appointment.time);
+
+    //   if (updatedTitle && updatedTime) {
+    //     this.appointments[dateKey][appointmentIndex] = {
+    //       ...appointment,
+    //       title: updatedTitle,
+    //       time: updatedTime,
+    //     };
+    //     this.cdr.detectChanges();
+    //   }
+    // }
+  }
+
+  updateAppointment(day: Date, oldAppointment: any, updatedAppointment: any) {
+    const dateKey = day.toISOString();
+    const appointmentIndex = this.appointments[dateKey]?.indexOf(oldAppointment);
+  
+    if (appointmentIndex !== -1) {
+      this.appointments[dateKey][appointmentIndex] = updatedAppointment;
+      this.cdr.detectChanges();
+    }
+  }
 
   hasAppointments(day: Date): boolean {
     return (this.appointments[day.toISOString()]?.length || 0) > 0;

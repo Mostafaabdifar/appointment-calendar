@@ -127,7 +127,7 @@
 
   &-title {
     flex-grow: 1;
-    width: 110px;
+    width: 100px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -138,6 +138,9 @@
   }
   .delete-icon {
     margin-left: auto;
+  }
+  .edit-icon {
+    margin-right: 8px;
   }
 }
 

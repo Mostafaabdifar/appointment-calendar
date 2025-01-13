@@ -11,11 +11,13 @@
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Title</mat-label>
       <input matInput formControlName="title" />
+      <mat-error> Title is required.</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Time</mat-label>
       <input matInput type="time" formControlName="time" />
+      <mat-error> Time is required.</mat-error>
     </mat-form-field>
 
     <div class="dialog-buttons">
@@ -26,7 +28,7 @@
         class="submit-button"
         [disabled]="!appointmentForm.valid"
       >
-        Save
+        {{submitButtonLabel }}
       </button>
       <button
         mat-raised-button
