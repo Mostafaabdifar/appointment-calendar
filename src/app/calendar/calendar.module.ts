@@ -11,6 +11,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { routes } from './calendar.routing.module';
 import { CalendarViewComponent } from './components/calendar-view/calendar-view.component';
+import { AppointmentService } from './service/appointment.service';
 
 @NgModule({
   declarations: [CalendarViewComponent],
@@ -26,5 +27,6 @@ import { CalendarViewComponent } from './components/calendar-view/calendar-view.
     DragDropModule,
     RouterModule.forChild(routes),
   ],
+  providers: [AppointmentService],
 })
 export class CalendarModule {}

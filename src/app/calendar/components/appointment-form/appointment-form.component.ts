@@ -30,6 +30,7 @@ import { AppointmentService } from '../../service/appointment.service';
     MatButtonModule,
     MatFormFieldModule,
   ],
+  providers: [AppointmentService],
 })
 export class AppointmentFormComponent {
   @Output() appointmentCreated = new EventEmitter<AppointmentFormValues>();
