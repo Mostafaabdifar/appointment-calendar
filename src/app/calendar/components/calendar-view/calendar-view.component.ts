@@ -3,27 +3,43 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AppointmentFormComponent } from '../appointment-form/appointment-form.component';
-import { AppointmentAlertComponent } from '../appointment-alert/appointment-alert.component';
+import { Subject, takeUntil } from 'rxjs';
 import { AppointmentFormValues } from '../../model/appointment';
+import { AppointmentService } from '../../service/appointment.service';
+import { AppointmentAlertComponent } from '../appointment-alert/appointment-alert.component';
+import { AppointmentFormComponent } from '../appointment-form/appointment-form.component';
 
 @Component({
   selector: 'app-calendar-view',
   templateUrl: './calendar-view.component.html',
   styleUrls: ['./calendar-view.component.scss'],
 })
-export class CalendarViewComponent {
+export class CalendarViewComponent implements OnInit, OnDestroy {
   selectedMonth: Date = new Date();
   daysInMonth: Date[] = [];
   appointments: { [key: string]: any[] } = {};
   minDate: Date = new Date();
   connectedDropLists: string[] = [];
+  private destroy$ = new Subject<void>();
 
-  constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) {
+  constructor(
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+    private appointmentService: AppointmentService
+  ) {
     this.updateCalendar();
     this.connectedDropLists = this.daysInMonth.map((day) => day.toISOString());
+  }
+
+  ngOnInit() {
+    this.appointmentService.appointments$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((appointments) => {
+        this.appointments = appointments;
+        this.cdr.detectChanges();
+      });
   }
 
   onMonthChange() {
@@ -54,25 +70,28 @@ export class CalendarViewComponent {
     const newDayKey = newDay.toISOString();
     const previousDayKey = event.previousContainer.id;
 
-    if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    } else {
+    if (event.previousContainer !== event.container) {
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
-      const movedAppointment = event.container.data[event.currentIndex];
-      movedAppointment.date = newDay.toLocaleDateString();
-      this.appointments[previousDayKey] = [...event.previousContainer.data];
-      this.appointments[newDayKey] = [...event.container.data];
+    } else {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
     }
-    this.cdr.detectChanges();
+
+    event.container.data[event.currentIndex].date = newDay.toLocaleDateString();
+
+    this.appointmentService.updateAppointments(
+      previousDayKey,
+      event.previousContainer.data
+    );
+    this.appointmentService.updateAppointments(newDayKey, event.container.data);
   }
 
   openAppointmentDialog(appointment: AppointmentFormValues): void {
@@ -119,34 +138,19 @@ export class CalendarViewComponent {
       width: '400px',
       data: { appointment, selectedDate: day },
     });
-  
+
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.updateAppointment(day, appointment, result);
       }
     });
-    // const dateKey = day.toISOString();
-    // const appointmentIndex = this.appointments[dateKey]?.indexOf(appointment);
-
-    // if (appointmentIndex !== -1) {
-    //   const updatedTitle = prompt('Edit Title', appointment.title);
-    //   const updatedTime = prompt('Edit Time (HH:MM)', appointment.time);
-
-    //   if (updatedTitle && updatedTime) {
-    //     this.appointments[dateKey][appointmentIndex] = {
-    //       ...appointment,
-    //       title: updatedTitle,
-    //       time: updatedTime,
-    //     };
-    //     this.cdr.detectChanges();
-    //   }
-    // }
   }
 
   updateAppointment(day: Date, oldAppointment: any, updatedAppointment: any) {
     const dateKey = day.toISOString();
-    const appointmentIndex = this.appointments[dateKey]?.indexOf(oldAppointment);
-  
+    const appointmentIndex =
+      this.appointments[dateKey]?.indexOf(oldAppointment);
+
     if (appointmentIndex !== -1) {
       this.appointments[dateKey][appointmentIndex] = updatedAppointment;
       this.cdr.detectChanges();
@@ -161,7 +165,12 @@ export class CalendarViewComponent {
     return day < this.minDate;
   }
 
-  dateClass(date: Date): string {
+  dateClass = (date: Date): string => {
     return this.isToday(date) ? 'highlight-today' : '';
+  };
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

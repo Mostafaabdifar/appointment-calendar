@@ -15,6 +15,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AppointmentFormValues } from '../../model/appointment';
+import { AppointmentService } from '../../service/appointment.service';
 
 @Component({
   selector: 'app-appointment-form',
@@ -40,6 +41,7 @@ export class AppointmentFormComponent {
   submitButtonLabel: string = 'Save';
 
   constructor(
+    private appointmentService: AppointmentService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AppointmentFormComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -60,21 +62,18 @@ export class AppointmentFormComponent {
 
   onSubmit(): void {
     if (this.appointmentForm.valid) {
-      const appointment = {
-        ...this.appointmentForm.value,
-        date:
-          this.appointmentForm.value.date ||
-          this.data.selectedDate?.toLocaleDateString(),
-      };
+      const appointment = { ...this.appointmentForm.value };
+      const dateKey = new Date(appointment.date).toISOString();
+      let currentAppointments =
+        this.appointmentService.appointmentsSubject.value[dateKey] || [];
 
-      if (this.data.appointment) {
-        this.appointmentUpdated.emit(appointment);
-      } else {
-        this.appointmentCreated.emit(appointment);
-      }
-
-      this.dialogRef.close(appointment);
-      this.appointmentForm.reset();
+      currentAppointments = this.data.appointment
+        ? currentAppointments.map((item) =>
+            item === this.data.appointment ? appointment : item
+          )
+        : [...currentAppointments, appointment];
+      this.appointmentService.updateAppointments(dateKey, currentAppointments);
+      this.dialogRef.close();
     }
   }
 
